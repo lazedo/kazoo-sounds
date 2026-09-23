@@ -1,0 +1,33 @@
+name: release
+# A tag builds and publishes kazoo-sounds-<tag>.tar.gz: the FreeSWITCH sounds
+# at every rate, made with sox from the masters in the tree
+# (hack/build-release.sh, no network), and kazoo-core as is. The operator
+# streams the asset into the sounds bucket (spec.media.sounds.tarball).
+on:
+  push:
+    tags: ['*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: existing tag to (re)build and publish
+        required: true
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
+      - run: sudo apt-get update -q && sudo apt-get install -y -q sox
+      - id: tag
+        run: echo "tag=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
+      - run: hack/build-release.sh "${{ steps.tag.outputs.tag }}"
+      - name: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          notes="FreeSWITCH sounds at 8000/16000/32000/48000 (sox from the 48 kHz masters in the tree) and kazoo-core as in the tree.\n\n\`\`\`\n$(cat build/kazoo-sounds-$TAG.tar.gz.sha256 | sed 's|.*/||')\n\`\`\`"
+          gh release create "$TAG" "build/kazoo-sounds-$TAG.tar.gz" "build/kazoo-sounds-$TAG.tar.gz.sha256" --title "$TAG" --notes "$(printf "$notes")" || gh release upload "$TAG" "build/kazoo-sounds-$TAG.tar.gz" "build/kazoo-sounds-$TAG.tar.gz.sha256" --clobber
