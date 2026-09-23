@@ -1,0 +1,11 @@
+# Voices taken from the official FreeSWITCH sound packages at build time
+# (hack/build-release.sh), 48 kHz masters; every other rate is generated
+# with sox. Columns: package  version  destination-under-freeswitch/  sha256
+# of freeswitch-sounds-<package>-48000-<version>.tar.gz (from
+# https://files.freeswitch.org/releases/sounds/<file>.sha256).
+# The destination is the path kazoo-configs-freeswitch's lang/*.xml
+# sound-prefix names (the package may spell the region differently: RU/ru).
+en-us-callie   1.0.53  en/us/callie   980591a853fbf763818eb77132ea7e3ed876f8c4701e85070d612e1ebba09ae9
+en-us-allison  1.0.2   en/us/allison  6c0b1c905a8ced1a5542c5f789f7aae3068494a647f7c5e702c3c3b795b5d96a
+fr-ca-june     1.0.51  fr/ca/june     abaea558fb5485abdd01d0b1186e03cf508f96ac90492814cc7ed4475e99a1e0
+ru-RU-elena    1.0.51  ru/ru/elena    ffd7d34907f6b6ac861e7898d2237ad763f242a17cd23811da28fd7745d3350d
